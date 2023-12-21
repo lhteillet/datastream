@@ -1,0 +1,31 @@
+services:
+  app1:
+    build: ./App_1
+    networks:
+      - app1_backend
+    ports:
+      - 5000:5000
+    volumes:
+      - ./App_1:/app
+  app2:
+    build: ./App_2
+    networks:
+      - app2_backend
+    ports:
+      - 5001:5001
+  db:
+    image: mysql:5.7
+    ports:
+      - "32000:3306"
+    networks:
+      - app1_backend
+      - app2_backend
+    environment:
+      MYSQL_ROOT_PASSWORD: e6d808b728e243ed26ac20dc6be6bd6977caa31414cded955dfa55ba79d6aedc
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data:/var/lib/mysql
+
+networks:
+  app1_backend:
+  app2_backend:
