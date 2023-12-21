@@ -1,5 +1,4 @@
 lab2
-Project
 TP1.ipynb
 hashpassword.py
 test.txt
@@ -8,3 +7,5 @@ test.txt
 data
 .DS_Store
 kafkaEnv
+streamVenv
+Project
