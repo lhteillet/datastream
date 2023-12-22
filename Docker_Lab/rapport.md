@@ -1,11 +1,12 @@
 # Docker Lab Session - Report
 
-I will explain in this report what were the different steps to build a batch of Containers composed of :
+This report explains the steps taken to build a batch of containers, consisting of:
+
 - 2 flask containers
 - one MySQL container
 
 
-Firstly, let's introduce our folder tree:
+# Folder structure
 ```
 .
 ├── App_1
@@ -23,9 +24,9 @@ Firstly, let's introduce our folder tree:
 └── readme.md
 ```
 
-## Definition of the app.py files
+# Definition of the app.py files
 
-### App1
+## App1
 
 ```
 from flask import Flask, jsonify
@@ -63,9 +64,9 @@ if __name__ == "__main__":
 
 ```
 
-This flask app works with a function start_connection(), which connects to a specific SQL database hosted by the MySQL container and just select all Employees name and title from this database.
+This Flask app works with a function start_connection(), which connects to a specific SQL database hosted by the MySQL container and selects all employee names and titles from this database.
 
-### App2
+## App2
 
 ```
 from flask import Flask 
@@ -80,13 +81,11 @@ if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0",port=5001)
 ```
 
-Just a simple second app which print "Hello, wolrd ! You are in App 2". 
 
-**Remark :** 
-We adjust the port to 5001 to avoid having conflicts between the two apps. By defaut, Flask app uses the port 5000.
+A simple second app that prints "Hello, World! You are in App 2." The port is adjusted to 5001 to avoid conflicts between the two apps (Flask app defaults to port 5000).
 
 
-### SQL
+## SQL
 init.sql
 ```
 CREATE DATABASE employees;
@@ -106,14 +105,11 @@ VALUES
   ('Anjali Gupta', 'Engineer');
 ```
 
-This file is an initiliazation SQL file and is executed each time the container starts to run. 
+This file initializes the SQL database, creating a database "employees" and a table "employee_data" with columns for employee name and title. Two rows of data are inserted into the table.
 
-Creates a data base " employees", then creates a table "employe_data" composed of a name and a title which are both of type VARCHAR(50). Finally add 2 rows in this dataset. 
+# Dockerfiles
 
-
-## Dockerfiles
-
-The two docker files in App_1 and App_2 folder are the same.
+The Dockerfiles in the `App_1` and `App_2` folders are identical:
 
 ```
 FROM python:3.9.6
@@ -124,14 +120,14 @@ COPY app1.py /app
 CMD ["python", "app1.py"]
 ```
 
-These files are used to create the image which will be run in the app containers. They are pretty simple, just a copy of the requirements.txt in the /app folder with all the Python packages we are required to run the app. 
+These files are used to create the image that will run in the app containers. They copy the requirements.txt file, install required Python packages, and copy the app1.py (or app2.py) file into the container's `/app` folder.
 
-Then install all of these packages and finally copy app1.py into /app folder of the container. It enables to easily creates a clean bind volume between local folders and the containers one. 
+Note: The Dockerfile refers to app1.py but it's also applicable to app2.py.
 
 **Remarks :**
 Thanks to binds volume, when the app.py is modified locally, the changes are directly reflected into the container folder. Thus, we can check directly the changes in the corresponding http adress.
 
-## docker-compose file
+# docker-compose file
 ```
 services:
   app1:
@@ -170,7 +166,7 @@ This file is maybe the most important because it sets all the parameters to crea
 
 The first line is services, it is where we are going to declare of our differents containers and their properties.
 
-### app1 container
+## app1 container
 We create a first container app1 which is builded base on the image created by the Dockerfile located in ./App_1 folder. 
 
 Then we define on which network this container will be able to interact with. Here the network is app1_backend, it means that all container connected to this network can interact with each others.
@@ -179,7 +175,7 @@ We also match our port 5000 to the port 5000 of the container.
 
 Finally, we set a bind volume between our local repository and the container's one. 
 
-### app2 container
+## app2 container
 
 We don't bind a volume to this app. In the lab context, we need at least one app with bind volume. 
 
@@ -187,7 +183,7 @@ We match our localhost 5001 port to the port 5000 of the container. Indeed, we a
 
 And we link this container to another network as we don't want any possible interactions between app1 and app2 container.
 
-### db container
+## db container
 
 This SQL database container is linked with the two app newtorks. So each app can interact with db container. 
 
