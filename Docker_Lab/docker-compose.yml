@@ -27,5 +27,5 @@ services:
       - ./data:/var/lib/mysql
 
 networks:
-  app1_backend:
-  app2_backend:
+  app1_frontend:
+  app2_frontend :
