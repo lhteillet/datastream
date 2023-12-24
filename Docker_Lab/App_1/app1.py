@@ -10,17 +10,19 @@ def start_connection():
         "user": "root",
         "passwd": "e6d808b728e243ed26ac20dc6be6bd6977caa31414cded955dfa55ba79d6aedc",
         "port": "3306",
-        'database': 'employees'
+        'database': 'customers'
         }
     connection = mysql.connector.connect(**config)
     cursor = connection.cursor(dictionary=True)
-    cursor.execute('SELECT Employee_Name, Title FROM employee_data')
+    cursor.execute('SELECT customers_name, total_purchases FROM customers_data')
     results = cursor.fetchall()
     cursor.close()
     connection.close()
-    return (jsonify({'Employee Data': results}).get_data(as_text=True)
-            + "\n"
-            + "It works well")
+    #return jsonify({'Customers Data': results}).get_data(as_text=True)
+    s = ""
+    for consumer in results:
+        s += consumer['customers_name'] + ' ' + str(consumer['total_purchases']) + '<br>'
+    return s
 
 
 @app.route('/')

@@ -1,15 +1,15 @@
-CREATE DATABASE employees;
-USE employees;
+CREATE DATABASE customers;
+USE customers;
 
 
-CREATE TABLE employee_data (
-  Employee_Name VARCHAR(50),
-  Title VARCHAR(50)
+CREATE TABLE customers_data (
+  customers_name VARCHAR(50),
+  total_purchases INT
 );
 
 
-INSERT INTO employee_data
-  (Employee_Name, Title)
+INSERT INTO customers_data
+  (customers_name, total_purchases)
 VALUES
-  ('Amit Khanna', 'Manager'),
-  ('Anjali Gupta', 'Engineer');
+  ('Amit Khanna', 2500),
+  ('Anjali Gupta', 3000);

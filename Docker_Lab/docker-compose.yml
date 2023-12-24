@@ -2,7 +2,7 @@ services:
   app1:
     build: ./App_1
     networks:
-      - app1_backend
+      - app1_frontend
     ports:
       - 5000:5000
     volumes:
@@ -10,7 +10,7 @@ services:
   app2:
     build: ./App_2
     networks:
-      - app2_backend
+      - app2_frontend
     ports:
       - 5001:5001
   db:
@@ -18,8 +18,8 @@ services:
     ports:
       - "32000:3306"
     networks:
-      - app1_backend
-      - app2_backend
+      - app1_frontend
+      - app2_frontend
     environment:
       MYSQL_ROOT_PASSWORD: e6d808b728e243ed26ac20dc6be6bd6977caa31414cded955dfa55ba79d6aedc
     volumes:

@@ -1,4 +1,4 @@
-# Docker Lab Session - Report
+# Docker Lab Session - Report - Louis TEILLET
 
 This report explains the steps taken to build a batch of containers, consisting of:
 
@@ -20,8 +20,8 @@ This report explains the steps taken to build a batch of containers, consisting 
 ├── db
 │   └── init.sql
 ├── docker-compose.yml
-├── rapport.md
-└── readme.md
+├── data
+    
 ```
 
 # Definition of the app.py files
@@ -39,19 +39,21 @@ def start_connection():
     config = {
         "host": "db",
         "user": "root",
-        "passwd": "mypassword",
+        "passwd": "e6d808b728e243ed26ac20dc6be6bd6977caa31414cded955dfa55ba79d6aedc",
         "port": "3306",
-        'database': 'employees'
+        'database': 'customers'
         }
     connection = mysql.connector.connect(**config)
     cursor = connection.cursor(dictionary=True)
-    cursor.execute('SELECT Employee_Name, Title FROM employee_data')
+    cursor.execute('SELECT customers_name, total_purchases FROM customers_data')
     results = cursor.fetchall()
     cursor.close()
     connection.close()
-    return (jsonify({'Employee Data': results}).get_data(as_text=True)
-            + "\n"
-            + "It works well")
+    #return jsonify({'Customers Data': results}).get_data(as_text=True)
+    s = ""
+    for consumer in results:
+        s += consumer['customers_name'] + ' ' + str(consumer['total_purchases']) + '<br>'
+    return s
 
 
 @app.route('/')
@@ -61,10 +63,9 @@ def hello_world():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
-
 ```
 
-This Flask app works with a function start_connection(), which connects to a specific SQL database hosted by the MySQL container and selects all employee names and titles from this database.
+This Flask app works with a function start_connection(), which connects to a specific SQL database hosted by the MySQL container and selects all consumers name and total amount of purchases from this database.
 
 ## App2
 
@@ -88,24 +89,24 @@ A simple second app that prints "Hello, World! You are in App 2." The port is ad
 ## SQL
 init.sql
 ```
-CREATE DATABASE employees;
-USE employees;
+CREATE DATABASE customers;
+USE customers;
 
 
-CREATE TABLE employee_data (
-  Employee_Name VARCHAR(50),
-  Title VARCHAR(50)
+CREATE TABLE customers_data (
+  customers_name VARCHAR(50),
+  total_purchases INT
 );
 
 
-INSERT INTO employee_data
-  (Employee_Name, Title)
+INSERT INTO customers_data
+  (customers_name, total_purchases)
 VALUES
-  ('Amit Khanna', 'Manager'),
-  ('Anjali Gupta', 'Engineer');
+  ('Amit Khanna', 2500),
+  ('Anjali Gupta', 3000);
 ```
 
-This file initializes the SQL database, creating a database "employees" and a table "employee_data" with columns for employee name and title. Two rows of data are inserted into the table.
+This file initializes the SQL database, creating a database "customers" and a table "customers_data" with columns for customers name and total amout of purchases. Two rows of data are then inserted into the table.
 
 # Dockerfiles
 
@@ -133,7 +134,7 @@ services:
   app1:
     build: ./App_1
     networks:
-      - app1_backend
+      - app1_frontend
     ports:
       - 5000:5000
     volumes:
@@ -141,7 +142,7 @@ services:
   app2:
     build: ./App_2
     networks:
-      - app2_backend
+      - app2_frontend
     ports:
       - 5001:5001
   db:
@@ -149,8 +150,8 @@ services:
     ports:
       - "32000:3306"
     networks:
-      - app1_backend
-      - app2_backend
+      - app1_frontend
+      - app2_frontend
     environment:
       MYSQL_ROOT_PASSWORD: "####"
     volumes:
@@ -159,7 +160,7 @@ services:
 
 networks:
   app1_frontend:
-  app2_frontend :
+  app2_frontend:
 ```
 
 This file is maybe the most important because it sets all the parameters to create the differents containers based on each image. Let's try to understand all of it. 
